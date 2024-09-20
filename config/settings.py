@@ -49,20 +49,6 @@ INSTALLED_APPS += [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'wagtail.contrib.forms',
-    'wagtail.contrib.redirects','wagtail.embeds',
-    'wagtail.sites',
-    'wagtail.users',
-    'wagtail.snippets',
-    'wagtail.documents',
-    'wagtail.images',
-    'wagtail.search',
-    'wagtail.admin',
-    'wagtail',
-
-    'modelcluster',
-    'taggit',
 ]
 
 MIDDLEWARE = [
@@ -74,8 +60,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
-
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -149,27 +133,34 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+if env.bool('IS_S3'):
+    AWS_ACCESS_KEY_ID = env('ACCESS_KEY')
+    AWS_SECRET_ACCESS_KEY = env('SECRET_KEY')
+    AWS_STORAGE_BUCKET_NAME = "hamesha-catalog"
+    AWSS_S3_SIGNATURE_VERSION = 's3v4'
+    AWS_S3_REGION_NAME = 'singapore'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_DEFAULT_ACL = None
+    AWS_S3_VERIFY = True
+    AWS_S3_ENDPOINT_URL = 'https://sgp1.vultrobjects.com'
+
+
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'public' / 'media'
 
 STORAGES = {
-
     "default": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
-
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
+if env("IS_S3"):
+    STORAGES["default"]["BACKEND"] = "storages.backends.s3boto3.S3Boto3Storage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# WAGTAIL
-WAGTAIL_SITE_NAME = '' #'My Example Site'
-WAGTAILADMIN_BASE_URL = '' #'http://example.com'
-WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'txt', 'xlsx', 'zip']
-
