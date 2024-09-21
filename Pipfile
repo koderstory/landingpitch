@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 rockstarter = "*"
+wagtail = "*"
 
 [dev-packages]
 

@@ -43,6 +43,24 @@ if DEBUG:
     ]
 
 INSTALLED_APPS += [
+
+    'landingpitch',  # your own app
+
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail',
+
+    'taggit',
+    'modelcluster',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,6 +78,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -136,7 +156,7 @@ STATICFILES_DIRS = [
 if env.bool('IS_S3'):
     AWS_ACCESS_KEY_ID = env('ACCESS_KEY')
     AWS_SECRET_ACCESS_KEY = env('SECRET_KEY')
-    AWS_STORAGE_BUCKET_NAME = "hamesha-catalog"
+    AWS_STORAGE_BUCKET_NAME = env('BUCKET_NAME')
     AWSS_S3_SIGNATURE_VERSION = 's3v4'
     AWS_S3_REGION_NAME = 'singapore'
     AWS_S3_FILE_OVERWRITE = False
@@ -157,10 +177,13 @@ STORAGES = {
     },
 }
 
-if env("IS_S3"):
+if env.bool("IS_S3"):
     STORAGES["default"]["BACKEND"] = "storages.backends.s3boto3.S3Boto3Storage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+WAGTAILADMIN_BASE_URL = env('WAGTAIL_URL')
+WAGTAIL_SITE_NAME=env('WAGTAIL_SITENAME')
