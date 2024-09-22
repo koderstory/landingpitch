@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+{% block content %}
+    <div class="container py-5">
+        <h1>{{ page.title }}</h1>
+        <div class="intro">{{ page.intro|richtext }}</div>
+        {% comment %}
+        -----------------------
+        
+        -----------------------
+        {% endcomment %}
+        {% for post in page.get_children %}
+            <div class="mt-4 border border-dark p-3">
+                <h2><a href="{% pageurl post %}">{{ post.title }}</a></h2>
+                <p>{{ post.specific.intro }}</p>
+                <p>{{ post.specific.body|richtext }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -6,6 +6,16 @@ from wagtail.admin.panels import FieldPanel
 from wagtail.search import index
 
 # Create your models here.
+class BlogPage(Page):
+    intro = RichTextField(blank=True)
+
+    template = 'landingpitch/pages/blogpage.html'
+
+    content_panels = Page.content_panels + [
+        FieldPanel('intro')
+    ]
+
+
 class PostPage(Page):
     date = models.DateField("Post date")
     intro = models.CharField(max_length=250)
