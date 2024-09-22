@@ -9,9 +9,8 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='index.html'), name='index'),
     
-    path('django-admin/', admin.site.urls),
+    path('dashboard/', admin.site.urls),
     path('web/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
 
