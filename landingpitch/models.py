@@ -10,6 +10,7 @@ class BlogPage(Page):
     intro = RichTextField(blank=True)
 
     template = 'landingpitch/pages/blogpage.html'
+    subpage_types = ['landingpitch.PostPage']
 
     content_panels = Page.content_panels + [
         FieldPanel('intro')
@@ -22,6 +23,8 @@ class PostPage(Page):
     body = RichTextField(blank=True)
 
     template = 'landingpitch/pages/postpage.html'
+    parent_page_types = ['landingpitch.BlogPage']
+    subpage_types = []
 
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
