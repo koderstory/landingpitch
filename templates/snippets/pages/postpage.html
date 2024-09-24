@@ -1,32 +1,28 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Landing Pitch</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-
-    <!-- Nunito Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
-        rel="stylesheet">
-
-    <!-- OPen Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-        rel="stylesheet">
-
-
-    <style>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Landing Pitch</title>
+        <!-- Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+              rel="stylesheet"
+              integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+              crossorigin="anonymous">
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+        <!-- Nunito Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+              rel="stylesheet">
+        <!-- OPen Sans -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+              rel="stylesheet">
+        <style>
         h1,
         h2,
         h3,
@@ -55,7 +51,7 @@
         }
 
         .container {
-            max-width: 700px;
+            max-width: 750px;
         }
 
         /* Progress bar */
@@ -72,152 +68,205 @@
             position: fixed;
             top: 0;
         }
-    </style>
-</head>
-
-<body class="d-flex flex-column">
-
-    <!-- READING BAR -->
-    <div id="progress-bar"></div>
-
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Offcanvas navbar large">
-        <div class="container">
-            <a class="navbar-brand" href="#">LOGO</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar2"
-                aria-controls="offcanvasNavbar2" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbar2"
-                aria-labelledby="offcanvasNavbar2Label">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="offcanvasNavbar2Label">Offcanvas</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
-                        aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <ul class="navbar-nav justify-content-end flex-grow-1 ps-3 gap-3">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Menu 1</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">Menu 2</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Sub Menu 2-1</a></li>
-                                <li><a class="dropdown-item" href="#">Sub Menu 2-2</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="#">Sub Menu 2-3</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="#">Menu 3</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Menu 4</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Menu 5</a></li>
-                    </ul>
+        </style>
+    </head>
+    <body class="d-flex flex-column">
+        <!-- READING BAR -->
+        <div id="progress-bar"></div>
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark"
+             aria-label="Offcanvas navbar large">
+            <div class="container">
+                <a class="navbar-brand" href="#">LOGO</a>
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasNavbar2"
+                        aria-controls="offcanvasNavbar2"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-end text-bg-dark"
+                     tabindex="-1"
+                     id="offcanvasNavbar2"
+                     aria-labelledby="offcanvasNavbar2Label">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbar2Label">Offcanvas</h5>
+                        <button type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="offcanvas"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-end flex-grow-1 ps-3 gap-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Menu 1</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">Menu 2</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="#">Sub Menu 2-1</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">Sub Menu 2-2</a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">Sub Menu 2-3</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Menu 3</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Menu 4</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Menu 5</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+        </nav>
+        <!-- breadcrumb -->
+        <div class="container my-3 border-bottom pt-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb px-1 px-md-4 rounded-3">
+                    <li class="breadcrumb-item">
+                        <a href="#" class="text-dark nav-link"><i class="ti ti-home fs-5"></i></a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#" class="text-dark">Library</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Data</li>
+                </ol>
+            </nav>
         </div>
-    </nav>
-
-    <!-- HEADER -->
-     <div class="container-fluid bg-dark text-white">
-        <div class="row" style="height:500px;background-image: url('https://getbootstrap.com/docs/5.3/examples/features/unsplash-photo-2.jpg');background-repeat:no-repeat;background-position: center center;"></div>
-        <div class="row"></div>
-     </div>
-
-
-    <!-- BODY -->
-    <div class="container pt-5 pb-1 flex-fill">
-
-        <!-- Header -->
-        <div class="row py-3 px-3" style="font-size: 14px;">
-            <div class="col-2 col-md-1 d-flex flex-column align-items-center justify-content-center">
-                <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" style="width:100%;" class="rounded-circle"
-                    alt="Avatar" />
-            </div>
-            <div class="col-10 col-md-8 d-flex flex-column justify-content-center">
-                <div class="fw-bold">Aldy Koderstory</div>
-                <div class="d-flex gap-3 text-secondary">
-                    <div>January 18, 2024</div>
-                    <div class="text-dark"><span id="time"></span> min read</div>
+        <!-- BODY -->
+        <div class="container pt-2 pb-1 flex-fill px-3 px-md-5 ">
+            <!-- TITLE -->
+            <h1 class="">Fall in love with the process over outcomes</h1>
+            <div class="d-flex gap-2">
+                <div class="py-1 px-3 bg-dark text-white rounded-pill small">
+                    <a href="" class="nav-link">Web Programming</a>
+                </div>
+                <div class="py-1 px-3 bg-dark text-white rounded-pill small">
+                    <a href="" class="nav-link">Linux</a>
                 </div>
             </div>
+            <!-- Profile -->
+            <div class="row py-3" style="font-size: 14px;">
+                <div class="col-2 col-md-1 d-flex flex-column align-items-center justify-content-center">
+                    <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
+                         style="width:100%"
+                         class="rounded-circle"
+                         alt="Avatar" />
+                </div>
+                <div class="col-10 col-md-8 d-flex flex-column justify-content-center">
+                    <div class="fw-bold">Aldy Koderstory</div>
+                    <div class="d-flex gap-3 text-secondary">
+                        <div>January 18, 2024</div>
+                        <div class="text-dark">
+                            <span id="time"></span> min read
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FEATURED IMAGE -->
+            <img class="my-1"
+                 width="100%"
+                 src="https://getbootstrap.com/docs/5.3/examples/features/unsplash-photo-2.jpg"
+                 alt="">
+            <div id="article" class="row pt-3 ">
+                <p>
+                    If you are like me and many other creatives, you have many interests and want to do many things. You’re
+                    excited at the beginning. Then two weeks later, it’s getting boring and you give up two months later.
+                </p>
+                <p>
+                    The main reason is you didn’t meet your goal. You don’t get many subscribers for your newsletter,
+                    YouTube,
+                    Instagram,… None read your post or you don’t lose any weight.
+                </p>
+                <p>
+                    Don’t get me wrong, setting goals for projects is a need. Goals are good for setting direction. But
+                    achieving
+                    the goal depends on many aspects. Many of them are external, things that are beyond your control.
+                </p>
+                <p>
+                    If you are like me and many other creatives, you have many interests and want to do many things. You’re
+                    excited at the beginning. Then two weeks later, it’s getting boring and you give up two months later.
+                </p>
+                <p>
+                    The main reason is you didn’t meet your goal. You don’t get many subscribers for your newsletter,
+                    YouTube,
+                    Instagram,… None read your post or you don’t lose any weight.
+                </p>
+                <p>
+                    Don’t get me wrong, setting goals for projects is a need. Goals are good for setting direction. But
+                    achieving
+                    the goal depends on many aspects. Many of them are external, things that are beyond your control.
+                </p>
+                <p>
+                    If you are like me and many other creatives, you have many interests and want to do many things. You’re
+                    excited at the beginning. Then two weeks later, it’s getting boring and you give up two months later.
+                </p>
+                <p>
+                    The main reason is you didn’t meet your goal. You don’t get many subscribers for your newsletter,
+                    YouTube,
+                    Instagram,… None read your post or you don’t lose any weight.
+                </p>
+                <p>
+                    Don’t get me wrong, setting goals for projects is a need. Goals are good for setting direction. But
+                    achieving
+                    the goal depends on many aspects. Many of them are external, things that are beyond your control.
+                </p>
+                <p>
+                    If you are like me and many other creatives, you have many interests and want to do many things. You’re
+                    excited at the beginning. Then two weeks later, it’s getting boring and you give up two months later.
+                </p>
+                <p>
+                    The main reason is you didn’t meet your goal. You don’t get many subscribers for your newsletter,
+                    YouTube,
+                    Instagram,… None read your post or you don’t lose any weight.
+                </p>
+                <p>
+                    Don’t get me wrong, setting goals for projects is a need. Goals are good for setting direction. But
+                    achieving
+                    the goal depends on many aspects. Many of them are external, things that are beyond your control.
+                </p>
+            </div>
+            <!-- TAGS-->
+            <div class="pb-5">
+                <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark" href="http://">Alpine JS</a></span>
+                <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark" href="http://">Alpine JS</a></span>
+                <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark" href="http://">Alpine JS</a></span>
+                <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark" href="http://">Alpine JS</a></span>
+                <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark" href="http://">Alpine JS</a></span>
+            </div>
         </div>
-
-        <!-- ARTICLE -->
-        <h1 class="px-3">Fall in love with the process over outcomes</h1>
-        <div id="article" class="row pt-3 px-3">
-            <p>If you are like me and many other creatives, you have many interests and want to do many things. You’re
-                excited at the beginning. Then two weeks later, it’s getting boring and you give up two months later.
-            </p>
-            <p>The main reason is you didn’t meet your goal. You don’t get many subscribers for your newsletter,
-                YouTube,
-                Instagram,… None read your post or you don’t lose any weight.</p>
-            <p>Don’t get me wrong, setting goals for projects is a need. Goals are good for setting direction. But
-                achieving
-                the goal depends on many aspects. Many of them are external, things that are beyond your control.</p>
-            <p>If you are like me and many other creatives, you have many interests and want to do many things. You’re
-                excited at the beginning. Then two weeks later, it’s getting boring and you give up two months later.
-            </p>
-            <p>The main reason is you didn’t meet your goal. You don’t get many subscribers for your newsletter,
-                YouTube,
-                Instagram,… None read your post or you don’t lose any weight.</p>
-            <p>Don’t get me wrong, setting goals for projects is a need. Goals are good for setting direction. But
-                achieving
-                the goal depends on many aspects. Many of them are external, things that are beyond your control.</p>
-            <p>If you are like me and many other creatives, you have many interests and want to do many things. You’re
-                excited at the beginning. Then two weeks later, it’s getting boring and you give up two months later.
-            </p>
-            <p>The main reason is you didn’t meet your goal. You don’t get many subscribers for your newsletter,
-                YouTube,
-                Instagram,… None read your post or you don’t lose any weight.</p>
-            <p>Don’t get me wrong, setting goals for projects is a need. Goals are good for setting direction. But
-                achieving
-                the goal depends on many aspects. Many of them are external, things that are beyond your control.</p>
-            <p>If you are like me and many other creatives, you have many interests and want to do many things. You’re
-                excited at the beginning. Then two weeks later, it’s getting boring and you give up two months later.
-            </p>
-            <p>The main reason is you didn’t meet your goal. You don’t get many subscribers for your newsletter,
-                YouTube,
-                Instagram,… None read your post or you don’t lose any weight.</p>
-            <p>Don’t get me wrong, setting goals for projects is a need. Goals are good for setting direction. But
-                achieving
-                the goal depends on many aspects. Many of them are external, things that are beyond your control.</p>
-        </div>
-    </div>
-
-    <!-- TAGS -->
-    <div class="container pb-5">
-        <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark"
-                href="http://">Alpine JS</a></span>
-        <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark"
-                href="http://">Alpine JS</a></span>
-        <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark"
-                href="http://">Alpine JS</a></span>
-        <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark"
-                href="http://">Alpine JS</a></span>
-        <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a class="nav-link text-dark"
-                href="http://">Alpine JS</a></span>
-        
-
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="footer mt-auto py-3 bg-dark text-white">
-        <div class="container">
-            <span class="">Place sticky footer content here.</span>
-        </div>
-    </footer>
-
-
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-
-    <script>
+        <!-- TAGS -->
+        <!-- FOOTER -->
+        <footer class="footer mt-auto py-3 bg-dark text-white">
+            <div class="container">
+                <span class="">Company 2024</span>
+            </div>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+                crossorigin="anonymous"></script>
+        <script>
         document.addEventListener("DOMContentLoaded", function () {
 
             // reading time bar
@@ -250,8 +299,6 @@
         });
 
 
-    </script>
-
-</body>
-
+        </script>
+    </body>
 </html>
