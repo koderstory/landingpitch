@@ -9,6 +9,7 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 urlpatterns = [
+    path('examples/blog', TemplateView.as_view(template_name='snippets/pages/blogpage.html')),
     path('examples/post', TemplateView.as_view(template_name='snippets/pages/postpage.html')),
 
 
