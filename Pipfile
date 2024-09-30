@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 rockstarter = "*"
 wagtail = "*"
+djlint = "*"
 
 [dev-packages]
 
