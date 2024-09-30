@@ -64,6 +64,7 @@ INSTALLED_APPS += [
     "wagtail",
     "modelcluster",
     "taggit",
+    "landingpitch",
 ]
 
 MIDDLEWARE = [
