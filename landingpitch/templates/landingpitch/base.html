@@ -1,4 +1,4 @@
-{% load static wagtailcore_tags %}
+{% load static wagtailcore_tags landingpitch_tags %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -23,7 +23,7 @@
         {# Add supported color schemes: #}
         <meta name="color-scheme" content="light dark">
         {# Add a favicon with inline SVG: #}
-        <link rel="icon" href="{% static 'img/favicon.png' %}" />
+        <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/b/b2/Bootstrap_logo.svg"/>
         {# Bootstrap #}
         <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/tabler-icons.min.css' %}">
@@ -35,11 +35,6 @@
         
         {% include "landingpitch/includes/header.html" %}
         {# Wrap your block content  within a <main> HTML5 tag: #}
-        
-        <div class="container">
-            <h1>Hello</h1>
-        </div>
-
         {% block content %}{% endblock %}
         {% include "landingpitch/includes/footer.html" %}
         {# Bootstrap #}
