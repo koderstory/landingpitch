@@ -1,6 +1,7 @@
 .venv
 .env
 db.sqlite3
+node_modules/
 
 
 # Byte-compiled / optimized / DLL files
