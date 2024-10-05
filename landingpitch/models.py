@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import RichTextField
@@ -20,4 +22,3 @@ class PostPage(Page):
     ]
 
     template = 'landingpitch/postpage.html'
-
