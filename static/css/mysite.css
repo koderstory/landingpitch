@@ -1,0 +1,17 @@
+.container {
+    max-width: 750px;
+}
+
+#progress-bar {
+    --scrollAmount: 0%;
+
+    background-image: linear-gradient(120deg, #ff6060 0%, #9f6aca 100%);
+    width: var(--scrollAmount);
+
+    /* background: linear-gradient(to right, #F24E1E var(--scrollAmount), transparent 0);
+    width: 100%; */
+
+    height: 4px;
+    position: fixed;
+    top: 0;
+}
