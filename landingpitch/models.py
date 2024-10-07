@@ -19,6 +19,13 @@ class BlogPage(Page):
 
     template = 'landingpitch/blogpage.html'
 
+    def get_context(self, request):
+        # Update context to include only published posts, ordered by reverse-chron
+        context = super().get_context(request)
+        postpages = self.get_children().live().order_by('-first_published_at')
+        context['postpages'] = postpages
+        return context
+
 class PostPage(Page):
     short = RichTextField(blank=True)
     body = RichTextField(blank=True)

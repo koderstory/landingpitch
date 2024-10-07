@@ -20,7 +20,7 @@
     <div class="container pt-2 pb-1 flex-fill px-3 px-md-5 ">
 
         <div class="row">
-            {% for post in page.get_children %}
+            {% for post in postpages %}
                 {% with post=post.specific %}
 
                     <div class="col-12">
@@ -49,7 +49,7 @@
 {#                                </div>#}
 
                                 <h3 class="mb-0"><a class="nav-link" href="{% pageurl post %}">{{ post.title }}</a></h3>
-                                <div class="mb-3 text-body-secondary">{{ post.specific.updated }}</div>
+                                <div class="mb-3 text-body-secondary">{{ post.specific.first_published_at }}</div>
                                 <p class="mb-auto">{{ post.specific.short|richtext}}</p>
                                 <a href="{% pageurl post %}" class="icon-link gap-1">
                                     Continue reading
