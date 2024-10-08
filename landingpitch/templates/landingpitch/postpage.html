@@ -1,5 +1,5 @@
 {% extends "landingpitch/base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 
 {% block body_class %}
@@ -37,10 +37,12 @@
             </div>
         </div>
         <!-- FEATURED IMAGE -->
+        {% image page.featured_image width-1000 as img %}
         <img class="my-1"
              width="100%"
-             src="https://getbootstrap.com/docs/5.3/examples/features/unsplash-photo-2.jpg"
+             src="{{ img.url }}"
              alt="">
+        
         <!-- BODY -->
         <div id="article" class="row pt-3 pb-5 ">{{ page.body|richtext }}</div>
         <!-- TAGS-->

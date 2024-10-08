@@ -1,5 +1,5 @@
 {% extends "landingpitch/base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 
 {% block body_class %}
@@ -27,10 +27,12 @@
                         <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
 
                             {# FEATURED PHOTO  #}
+                            {% image post.featured_image width-1000 as img %}
+        
                             <div class="col-12 d-none d-md-block" style="
                             width: 100%; /* Set container width */
                             height: 300px; /* Set container height */
-                            background-image: url('https://getbootstrap.com/docs/5.3/examples/features/unsplash-photo-2.jpg'); /* Set the background image */
+                            background-image: url('{{ img.url }}'); /* Set the background image */
                             background-position: center; /* Center the image */
                             background-size: cover; /* Ensure the image covers the container */
                             background-repeat: no-repeat; /* Prevent the image from repeating */
@@ -49,8 +51,8 @@
 {#                                </div>#}
 
                                 <h3 class="mb-0"><a class="nav-link" href="{% pageurl post %}">{{ post.title }}</a></h3>
-                                <div class="mb-3 text-body-secondary">{{ post.specific.first_published_at }}</div>
-                                <p class="mb-auto">{{ post.specific.short|richtext}}</p>
+                                <div class="mb-3 text-body-secondary">{{ post.first_published_at }}</div>
+                                <p class="mb-auto">{{ post.short|richtext}}</p>
                                 <a href="{% pageurl post %}" class="icon-link gap-1">
                                     Continue reading
                                     <i class=" ti ti-arrow-narrow-right"></i>

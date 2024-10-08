@@ -30,12 +30,12 @@
                         aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-                <ul class="navbar-nav justify-content-end flex-grow-1 ps-3 gap-3">
+                <ul class="navbar-nav justify-content-end flex-grow-1 ps-3 gap-4">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Home</a>
                     </li>
                     {% for menuitem in site_root.get_children.live.in_menu %}
-                        <li class="nav-item">
+                        <li class="nav-item border">
                             <a class="nav-link" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
                         </li>
                     {% endfor %}

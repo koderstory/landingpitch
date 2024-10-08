@@ -31,10 +31,12 @@ class PostPage(Page):
     body = RichTextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    featured_image = models.ForeignKey('wagtailimages.Image', on_delete=models.SET_NULL, related_name='+', blank=True,null=True,)
 
     content_panels = Page.content_panels + [
         FieldPanel('body'),
         FieldPanel('short'),
+        FieldPanel('featured_image'),
     ]
 
     template = 'landingpitch/postpage.html'
