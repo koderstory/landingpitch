@@ -1,15 +1,47 @@
+{#<!-- breadcrumb -->#}
+{#<div class="container-fluid  border-bottom">#}
+{#    <div class="container my-3 pt-3">#}
+{#        <nav aria-label="breadcrumb">#}
+{#            <ol class="breadcrumb px-1 px-md-4 rounded-3">#}
+{#                <li class="breadcrumb-item">#}
+{#                    <a href="#" class="text-dark nav-link"><i class="ti ti-home fs-5"></i></a>#}
+{#                </li>#}
+{#                <li class="breadcrumb-item">#}
+{#                    <a href="#" class="text-dark">Library</a>#}
+{#                </li>#}
+{#                <li class="breadcrumb-item active" aria-current="page">Data</li>#}
+{#            </ol>#}
+{#        </nav>#}
+{#    </div>#}
+{#</div>#}
+{% load wagtailcore_tags wagtailimages_tags %}
+{% wagtail_site as current_site %}
+
 <!-- breadcrumb -->
-<div class="container-fluid  border-bottom">
+
+<!-- breadcrumb -->
+<div class="container-fluid border-bottom">
     <div class="container my-3 pt-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb px-1 px-md-4 rounded-3">
-                <li class="breadcrumb-item">
-                    <a href="#" class="text-dark nav-link"><i class="ti ti-home fs-5"></i></a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="#" class="text-dark">Library</a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">Data</li>
+                <!-- Home link (root page) -->
+{#                <li class="breadcrumb-item">#}
+{#                    <a href="{% pageurl current_site.root_page %}" class="text-dark nav-link"><i#}
+{#                            class="ti ti-home fs-5"></i></a>#}
+{#                </li>#}
+
+                <!-- Loop through ancestors and display them -->
+                {% for ancestor in page.get_ancestors %}
+                    {% if ancestor.live and not ancestor.is_root and ancestor != current_site.root_page %}
+                        <li class="breadcrumb-item">
+                            <a href="{{ ancestor.url }}" class="text-dark">{{ ancestor.title }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            
+
+                <!-- Current page (active) -->
+{#                <li class="breadcrumb-item active" aria-current="page">{{ page.title }}</li>#}
             </ol>
         </nav>
     </div>
