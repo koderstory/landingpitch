@@ -10,14 +10,14 @@
     <div class="container pt-5 pb-5 flex-fill px-3 px-md-5 ">
         <h1 class="">{{ page.title }}</h1>
         {#  TAGS CATEGORY #}
-{#        <div class="d-flex gap-2">#}
-{#            <div class="py-1 px-3 bg-dark text-white rounded-pill small">#}
-{#                <a href="" class="nav-link">Web Programming</a>#}
-{#            </div>#}
-{#            <div class="py-1 px-3 bg-dark text-white rounded-pill small">#}
-{#                <a href="" class="nav-link">Linux</a>#}
-{#            </div>#}
-{#        </div>#}
+        {#        <div class="d-flex gap-2">#}
+        {#            <div class="py-1 px-3 bg-dark text-white rounded-pill small">#}
+        {#                <a href="" class="nav-link">Web Programming</a>#}
+        {#            </div>#}
+        {#            <div class="py-1 px-3 bg-dark text-white rounded-pill small">#}
+        {#                <a href="" class="nav-link">Linux</a>#}
+        {#            </div>#}
+        {#        </div>#}
         <!-- Profile -->
         <div class="row py-3 mt-2" style="font-size: 14px;">
             <div class="col-2 col-md-1 d-flex flex-column align-items-center justify-content-center">
@@ -42,21 +42,20 @@
              width="100%"
              src="{{ img.url }}"
              alt="">
-        
+
         <!-- BODY -->
-        <div id="article" class="row pt-3 pb-5 ">{{ page.body|richtext }}</div>
+        <div id="article" class="row pt-3 pb-4 ">{{ page.body|richtext }}</div>
         <!-- TAGS-->
-        <div class="pb-5">
-            <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a
-                    class="nav-link text-dark" href="http://">Alpine JS</a></span>
-            <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a
-                    class="nav-link text-dark" href="http://">Alpine JS</a></span>
-            <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a
-                    class="nav-link text-dark" href="http://">Alpine JS</a></span>
-            <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a
-                    class="nav-link text-dark" href="http://">Alpine JS</a></span>
-            <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1"><a
-                    class="nav-link text-dark" href="http://">Alpine JS</a></span>
-        </div>
+        {% with tags=page.tags.all %}
+            {% if tags %}
+                <div class="pb-5">
+                    {% for tag in tags %}
+                        <span class="badge bg-secondary-subtle text-primary-emphasis rounded-pill px-4 py-2 m-1">
+                            <a class="nav-link text-dark" href="{% slugurl 'tags' %}?tag={{ tag }}">{{ tag }}</a>
+                        </span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
     </div>
 {% endblock %}

@@ -2,6 +2,9 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from modelcluster.contrib.taggit import ClusterTaggableManager
+from modelcluster.fields import ParentalKey
+from taggit.models import TaggedItemBase
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import RichTextField
 from wagtail.models import Page
@@ -33,10 +36,38 @@ class PostPage(Page):
     updated = models.DateTimeField(auto_now=True)
     featured_image = models.ForeignKey('wagtailimages.Image', on_delete=models.SET_NULL, related_name='+', blank=True,null=True,)
 
+    tags = ClusterTaggableManager(through="PostPageTag", blank=True)
+
     content_panels = Page.content_panels + [
         FieldPanel('body'),
+        FieldPanel('tags'),
         FieldPanel('short'),
         FieldPanel('featured_image'),
     ]
 
     template = 'landingpitch/postpage.html'
+
+
+class BlogPageWithTag(Page):
+
+    template = 'landingpitch/blogpage_with_tag.html'
+
+    def get_context(self, request):
+
+        # Filter by tag
+        tag = request.GET.get('tag')
+        postpages = PostPage.objects.filter(tags__name=tag)
+
+        # Update template context
+        context = super().get_context(request)
+        context['postpages'] = postpages
+        return context
+
+
+class PostPageTag(TaggedItemBase):
+    content_object = ParentalKey(
+        'PostPage',
+        related_name='tagged_items',
+        on_delete=models.CASCADE,
+    )
+
