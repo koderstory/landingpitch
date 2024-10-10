@@ -66,25 +66,42 @@
             {% endfor %}
         </div>
 
-        <!-- PAGINATION -->
-        <nav class="blog-pagination mt-2 mb-5 text-center" aria-label="Pagination">
+        {# PAGINATION #}
+        <ul class="pagination">
+            {% if postpages.has_previous %}
+                <li class="page-item me-2">
+                    <a class="page-link rounded border-dark text-dark" href="?page={{ postpages.previous_page_number }}">«</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled me-2">
+                    <a class="page-link rounded border-dark text-dark" href="#">«</a>
+                </li>
+            {% endif %}
 
+            {# Set the range of pages to display around the current page #}
+            {% for i in postpages.paginator.page_range %}
+                {% if i == postpages.number %}
+                    <li class="page-item active me-2">
+                        <a class="page-link rounded bg-dark text-white border-dark" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                {% elif i >= postpages.number|add:'-2' and i <= postpages.number|add:'2' %}
+                    <li class="page-item me-2">
+                        <a class="page-link rounded border-dark text-dark" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
 
-        {% if postpages.has_previous %}
-            <a href="?page=1" class="btn btn-outline-secondary rounded-pill">&laquo; First</a>
-            <a href="?page={{ postpages.previous_page_number }}" class="btn btn-outline-secondary rounded-pill">Previous</a>
-        {% endif %}
+            {% if postpages.has_next %}
+                <li class="page-item me-2">
+                    <a class="page-link rounded border-dark text-dark" href="?page={{ postpages.next_page_number }}">»</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled me-2">
+                    <a class="page-link rounded border-dark text-dark" href="#">»</a>
+                </li>
+            {% endif %}
+        </ul>
 
-         <span class="current">
-            Page {{ postpages.number }} of {{ postpages.paginator.num_pages }}.
-        </span>
-
-        {% if postpages.has_next %}
-            <a href="?page={{ postpages.next_page_number }}" class="btn btn-outline-secondary rounded-pill">Next</a>
-            <a href="?page={{ postpages.paginator.num_pages }}" class="btn btn-outline-secondary rounded-pill">Last &raquo;</a>
-        {% endif %}
-
-        </nav>
 
     </div>
 
