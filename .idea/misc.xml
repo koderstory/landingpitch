@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="/srv/02_landingpitch/.venv/bin/python" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="/srv/01_landingpitch/.venv/bin/python" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="/srv/02_landingpitch/.venv/bin/python" project-jdk-type="Python SDK" />
 </project>

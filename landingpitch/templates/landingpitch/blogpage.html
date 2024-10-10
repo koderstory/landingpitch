@@ -68,10 +68,24 @@
 
         <!-- PAGINATION -->
         <nav class="blog-pagination mt-2 mb-5 text-center" aria-label="Pagination">
-            <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
-            <a class="btn btn-outline-secondary rounded-pill disabled"
-               aria-disabled="true">Newer</a>
+
+
+        {% if postpages.has_previous %}
+            <a href="?page=1" class="btn btn-outline-secondary rounded-pill">&laquo; First</a>
+            <a href="?page={{ postpages.previous_page_number }}" class="btn btn-outline-secondary rounded-pill">Previous</a>
+        {% endif %}
+
+         <span class="current">
+            Page {{ postpages.number }} of {{ postpages.paginator.num_pages }}.
+        </span>
+
+        {% if postpages.has_next %}
+            <a href="?page={{ postpages.next_page_number }}" class="btn btn-outline-secondary rounded-pill">Next</a>
+            <a href="?page={{ postpages.paginator.num_pages }}" class="btn btn-outline-secondary rounded-pill">Last &raquo;</a>
+        {% endif %}
+
         </nav>
+
     </div>
 
 {% endblock %}
