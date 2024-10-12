@@ -54,19 +54,14 @@
 
 <!-- READING BAR -->
 <div id="progress-bar"></div>
-
 <!-- NAVBAR -->
 {% include "landingpitch/includes/header.html" %}
-
 <!-- BREADCRUMB -->
-{#{% include 'landingpitch/includes/breadcrumb.html' %}#}
-
+{% include 'landingpitch/includes/breadcrumb.html' %}
 <!-- CONTENT -->
 {% block content %}{% endblock %}
-
 <!-- FOOTER -->
 {% include "landingpitch/includes/footer.html" %}
-
 <!-- JS -->
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/mysite.js' %}"></script>
