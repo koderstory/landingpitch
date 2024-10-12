@@ -32,11 +32,11 @@
 
                 <!-- Loop through ancestors and display them -->
                 {% for ancestor in page.get_ancestors %}
-                    {% if ancestor.live and not ancestor.is_root and ancestor != current_site.root_page %}
+{#                    {% if ancestor.live and not ancestor.is_root and ancestor != current_site.root_page %}#}
                         <li class="breadcrumb-item">
                             <a href="{{ ancestor.url }}" class="text-dark">{{ ancestor.title }}</a>
                         </li>
-                    {% endif %}
+{#                    {% endif %}#}
                 {% endfor %}
             
 

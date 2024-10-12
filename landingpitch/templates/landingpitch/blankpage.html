@@ -1,7 +1,9 @@
 {% extends 'landingpitch/base.html' %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
-	<div class="container">
-        <h>{{ page.title }}</h>
-    </div>
+{#	<div class="container">#}
+{#        <h>{{ page.title }}</h>#}
+{#    </div>#}
+    {% include_block page.body %}
 {% endblock %}

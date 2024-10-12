@@ -7,13 +7,36 @@ from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
 from wagtail.admin.panels import FieldPanel
-from wagtail.fields import RichTextField
+from wagtail.blocks import StreamBlock, StructBlock
+from wagtail.fields import RichTextField, StreamField
 from wagtail.models import Page
 
 
 # Create your models here.
+
+
+class HeroBlock(StructBlock):
+    class Meta:
+        template = 'landingpitch/blocks/hero.html'
+
+class SectionBlock(StructBlock):
+    class Meta:
+        template = 'landingpitch/blocks/section.html'
+
+
+
 class BlankPage(Page):
+
+    body = StreamField([
+        ('hero', HeroBlock()),
+        ('section', SectionBlock()),
+    ], null=True, blank=True)
+
     template = 'landingpitch/blankpage.html'
+
+    content_panels = Page.content_panels + [
+        FieldPanel('body'),
+    ]
 
 
 class BlogPage(Page):
