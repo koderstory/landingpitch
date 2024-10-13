@@ -7,7 +7,7 @@ from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
 from wagtail.admin.panels import FieldPanel
-from wagtail.blocks import StreamBlock, StructBlock
+from wagtail.blocks import StreamBlock, StructBlock, RichTextBlock
 from wagtail.fields import RichTextField, StreamField
 from wagtail.models import Page
 
@@ -16,6 +16,8 @@ from wagtail.models import Page
 
 
 class HeroBlock(StructBlock):
+    content = RichTextBlock(blank=True, null=True)
+
     class Meta:
         template = 'landingpitch/blocks/hero.html'
 

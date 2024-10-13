@@ -46,3 +46,25 @@ p {
     position: fixed;
     top: 0;
 }
+
+/* Container with background image */
+.background-overlay {
+    position: relative;
+    background-image: url('https://images.pexels.com/photos/245240/pexels-photo-245240.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'); /* Replace with your image URL */
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+    color:white;
+}
+
+/* Overlay with semi-transparent effect */
+.background-overlay::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Semi-transparent overlay (50% black) */
+    z-index: -1; /* Keep overlay behind the text */
+}
