@@ -9,6 +9,24 @@ button {
     font-family: "Nunito", sans-serif;
     font-optical-sizing: auto;
     font-weight: 800;
+    /*margin-top: 1.5rem;*/
+    /*margin-bottom: 1.5rem;*/
+}
+
+p {
+    font-family: "Open Sans", sans-serif;
+    font-weight: 400;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.display-1,
+.display-2,
+.display-3,
+.display-4,
+.display-5,
+.display-6{
+    font-weight: 800;!important;
 }
 
 .container {
