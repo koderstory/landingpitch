@@ -5,8 +5,8 @@ set -euo pipefail
 # Color definitions
 # -------------------------------------------------------------------
 # \e[32m = green, \e[0m = reset
-GREEN='\e[32m'
-RESET='\e[0m'
+GREEN=$'\e[32m'
+RESET=$'\e[0m'
 
 # Helper to print in green
 print_green() {
@@ -146,14 +146,19 @@ apt install -y /tmp/wkhtmltox.deb
 rm /tmp/wkhtmltox.deb
 
 # -------------------------------------------------------------------
-# 14. Clone Odoo Community Edition & install Python dependencies
+# 14. Clone Odoo Community Edition & install Python requirements
 # -------------------------------------------------------------------
 print_green ">>> Cloning Odoo 18.0 CE and installing Python requirements..."
 ODOO_REPO="https://github.com/odoo/odoo.git"
 git clone -b "18.0" --single-branch --depth 1 "$ODOO_REPO" /opt/odoo-ce
-cd /opt/odoo-ce
+
+# -------------------------------------------------------------------
+# 15. Symlink odoo-bin into PATH
+# -------------------------------------------------------------------
+print_green ">>> Creating symlink for odoo-bin into /usr/local/bin..."
+ln -sf /opt/odoo-ce/odoo-bin /usr/local/bin/odoo-bin
 
 # -------------------------------------------------------------------
 # All done
 # -------------------------------------------------------------------
-print_green ">>> All done! Your system is ready."
+print_green ">>> All done! You can now run 'odoo-bin' from anywhere."
