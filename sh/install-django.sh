@@ -17,7 +17,7 @@ fi
 SERVER_IP="$(hostname -I | awk '{print $1}')"
 
 # project naming
-PROJECT_ROOT_NAME="Project"   # your top‐level folder under $DOMAIN
+PROJECT_ROOT_NAME="Project"   # top‐level folder under $DOMAIN
 DJANGO_APP_NAME="Project"     # inner Django project folder
 
 # computed paths
@@ -29,6 +29,7 @@ VENV_DIR="${BASE_DIR}/.venv"
 SOCK_PATH="/run/serv.${DOMAIN}.sock"
 SOCKET_UNIT="/etc/systemd/system/serv.${DOMAIN}.socket"
 SERVICE_UNIT="/etc/systemd/system/serv.${DOMAIN}.service"
+NGINX_CONF="/etc/nginx/sites-available/${DOMAIN}"
 
 # -------------------------------------------------------------------
 # 1) Must be run as root
@@ -47,11 +48,10 @@ cd "\$HOME"
 
 # create folder structure
 mkdir -p "${PROJECT_DIR}"
-# NEW: create assets dir
-mkdir -p "${BASE_DIR}/assets"
+mkdir -p "${BASE_DIR}/assets" "${BASE_DIR}/public/static" "${BASE_DIR}/public/upload"
 cd "${BASE_DIR}"
 
-# init in-project venv and install packages
+# init in‐project venv and install packages
 export PIPENV_VENV_IN_PROJECT=1
 pipenv install django==5.2 \
                gunicorn \
@@ -70,7 +70,6 @@ EOF
 # -------------------------------------------------------------------
 # 3a) ALLOWED_HOSTS
 sed -i "s|^ALLOWED_HOSTS = .*|ALLOWED_HOSTS = ['${DOMAIN}','${SERVER_IP}']|" "$SETTINGS_FILE"
-
 # 3b) Remove any old static/media lines
 sed -i \
   -e '/^STATIC_URL =/d' \
@@ -79,7 +78,6 @@ sed -i \
   -e '/^MEDIA_URL =/d' \
   -e '/^MEDIA_ROOT =/d' \
   "$SETTINGS_FILE"
-
 # 3c) Append the exact block
 cat >> "$SETTINGS_FILE" <<'EOP'
 
@@ -114,47 +112,95 @@ if settings.DEBUG:
 EOP
 
 # -------------------------------------------------------------------
-# 5) Create systemd socket unit
+# 5) Collect static files
+# -------------------------------------------------------------------
+sudo -u "$SYS_USER" bash <<EOF
+set -euo pipefail
+cd "$PROJECT_DIR"
+# ensure venv is activated
+export PIPENV_VENV_IN_PROJECT=1
+pipenv run python manage.py collectstatic --noinput
+EOF
+
+# -------------------------------------------------------------------
+# 6) Create systemd socket unit
 # -------------------------------------------------------------------
 cat > "$SOCKET_UNIT" <<EOF
 [Unit]
-Description=gunicorn socket → ${DOMAIN}
+Description=gunicorn socket → $DOMAIN
 
 [Socket]
-ListenStream=${SOCK_PATH}
+ListenStream=$SOCK_PATH
 
 [Install]
 WantedBy=sockets.target
 EOF
 
 # -------------------------------------------------------------------
-# 6) Create systemd service unit
+# 7) Create systemd service unit
 # -------------------------------------------------------------------
 cat > "$SERVICE_UNIT" <<EOF
 [Unit]
-Description=gunicorn service for ${DOMAIN}
-Requires=serv.${DOMAIN}.socket
+Description=gunicorn service for $DOMAIN
+Requires=serv.$DOMAIN.socket
 After=network.target
 
 [Service]
-User=${SYS_USER}
-Group=${SYS_USER}
-WorkingDirectory=${PROJECT_DIR}
-ExecStart=${VENV_DIR}/bin/gunicorn \\
+User=$SYS_USER
+Group=$SYS_USER
+WorkingDirectory=$PROJECT_DIR
+ExecStart=$VENV_DIR/bin/gunicorn \\
           --access-logfile - \\
           --workers 3 \\
-          --bind unix:${SOCK_PATH} \\
-          --chdir ${PROJECT_DIR}/${DJANGO_APP_NAME} \\
-          ${DJANGO_APP_NAME}.wsgi:application
+          --bind unix:$SOCK_PATH \\
+          --chdir $PROJECT_DIR/$DJANGO_APP_NAME \\
+          $DJANGO_APP_NAME.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
 # -------------------------------------------------------------------
-# 7) Enable & start socket
+# 8) Enable & start socket
 # -------------------------------------------------------------------
 systemctl daemon-reload
-systemctl enable --now "serv.${DOMAIN}.socket"
+systemctl enable --now "serv.$DOMAIN.socket"
 
-echo "✅ Deployed Django at ${DOMAIN} (IP ${SERVER_IP}), assets dir created, socket: ${SOCK_PATH}"
+# -------------------------------------------------------------------
+# 9) Configure nginx
+# -------------------------------------------------------------------
+cat > "$NGINX_CONF" <<EOF
+server {
+    listen 80;
+    server_name $DOMAIN;
+
+    error_log /var/log/nginx/$DOMAIN.error.log;
+    access_log /var/log/nginx/$DOMAIN.access.log;
+    rewrite_log on;
+    server_tokens off;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection '1; mode=block';
+
+    location /static/ {
+        root $BASE_DIR/public/static;
+        expires 30d;
+        log_not_found off;
+        access_log off;
+    }
+    location /upload/ {
+        root $BASE_DIR/public/upload;
+        expires 30d;
+        log_not_found off;
+        access_log off;
+    }
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:$SOCK_PATH;
+    }
+}
+EOF
+
+ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+
+echo "✅ Deployed Django at $DOMAIN (IP $SERVER_IP), static collected, nginx configured, socket: $SOCK_PATH"
