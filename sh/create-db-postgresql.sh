@@ -18,10 +18,8 @@ EOF
   exit 1
 }
 
-# -------------------------------------------------------------------
-# 1. Validate args
-# -------------------------------------------------------------------
-if [ $# -ne 3 ]; then
+# 1) Validate args
+if [[ $# -ne 3 ]]; then
   usage
 fi
 
@@ -29,51 +27,50 @@ DB_USER="$1"
 DB_NAME="$2"
 DB_PASS="$3"
 
-# -------------------------------------------------------------------
-# 2. Create role and database as the postgres superuser
-# -------------------------------------------------------------------
-echo ">>> Creating role '$DB_USER' and database '$DB_NAME'..."
+# Helper to run psql as the postgres superuser
+psql_postgres() {
+  sudo -u postgres psql -v ON_ERROR_STOP=1 -qAt --username=postgres "$@"
+}
 
-sudo -u postgres psql <<-SQL
--- create role if not exists
-DO
-\$do\$
-BEGIN
-   IF NOT EXISTS (
-      SELECT FROM pg_catalog.pg_roles WHERE rolname = '$DB_USER'
-   ) THEN
-      CREATE ROLE "$DB_USER"
-        WITH LOGIN
-             PASSWORD '$DB_PASS'
-             NOSUPERUSER
-             NOCREATEDB
-             NOREPLICATION
-             INHERIT;
-   END IF;
-END
-\$do\$;
+echo ">>> Checking for role '$DB_USER'..."
+if psql_postgres -c "SELECT 1 FROM pg_roles WHERE rolname = '$DB_USER';" | grep -q 1; then
+  echo "    Role '$DB_USER' already exists, skipping CREATE ROLE."
+else
+  echo "    Creating role '$DB_USER'..."
+  psql_postgres <<-SQL
+    CREATE ROLE "$DB_USER"
+      WITH LOGIN
+           PASSWORD '$DB_PASS'
+           NOSUPERUSER
+           NOCREATEDB
+           NOREPLICATION
+           INHERIT;
+SQL
+fi
 
--- create database if not exists
-SELECT
-  CASE
-    WHEN EXISTS(
-      SELECT FROM pg_catalog.pg_database WHERE datname = '$DB_NAME'
-    ) THEN
-      'Database already exists, skipping creation.'
-    ELSE
-      'Creating database.'
-  END;
-\gexec
+echo ">>> Checking for database '$DB_NAME'..."
+if psql_postgres -c "SELECT 1 FROM pg_database WHERE datname = '$DB_NAME';" | grep -q 1; then
+  echo "    Database '$DB_NAME' already exists, skipping CREATE DATABASE."
+else
+  echo "    Creating database '$DB_NAME' owned by '$DB_USER'..."
+  psql_postgres <<-SQL
+    CREATE DATABASE "$DB_NAME"
+      WITH OWNER = "$DB_USER"
+           TEMPLATE = template0;
+SQL
+fi
 
-CREATE DATABASE "$DB_NAME"
-  WITH OWNER = "$DB_USER"
-       TEMPLATE = template0;
+echo ">>> Terminating any connections to '$DB_NAME'..."
+sudo -u postgres psql -v ON_ERROR_STOP=1 -qAt --username=postgres -d postgres <<-SQL
+  SELECT pg_terminate_backend(pid)
+  FROM pg_stat_activity
+  WHERE datname = '$DB_NAME';
+SQL
 
-\connect "$DB_NAME"
-
--- lock down public schema
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-GRANT USAGE, CREATE ON SCHEMA public TO "$DB_USER";
+echo ">>> Locking down schema in database '$DB_NAME'..."
+sudo -u postgres psql -v ON_ERROR_STOP=1 -qAt --username=postgres -d "$DB_NAME" <<-SQL
+  REVOKE ALL ON SCHEMA public FROM PUBLIC;
+  GRANT USAGE, CREATE ON SCHEMA public TO "$DB_USER";
 SQL
 
 echo "✅ Done. Role '$DB_USER' and database '$DB_NAME' are ready."

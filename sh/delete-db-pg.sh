@@ -16,49 +16,32 @@ EOF
   exit 1
 }
 
-# -------------------------------------------------------------------
-# 1. Validate args
-# -------------------------------------------------------------------
-if [ $# -ne 2 ]; then
+# 1) Validate args
+if [[ $# -ne 2 ]]; then
   usage
 fi
 
 DB_USER="$1"
 DB_NAME="$2"
 
-# -------------------------------------------------------------------
-# 2. Drop database and role as the postgres superuser
-# -------------------------------------------------------------------
-echo ">>> Dropping database '$DB_NAME' (if exists)..."
-sudo -u postgres psql -v ON_ERROR_STOP=1 <<-SQL
-  SELECT
-    CASE
-      WHEN EXISTS (
-        SELECT 1 FROM pg_catalog.pg_database WHERE datname = '$DB_NAME'
-      ) THEN
-        'Dropping database.'
-      ELSE
-        'Database does not exist, skipping.'
-    END
-  \gexec
+# 2) Terminate connections to the database (needed for DROP DATABASE)
+echo ">>> Terminating connections to database '$DB_NAME'..."
+sudo -u postgres psql -v ON_ERROR_STOP=1 -c "
+  SELECT pg_terminate_backend(pid)
+  FROM pg_stat_activity
+  WHERE datname = '$DB_NAME'
+;"
 
-  DROP DATABASE IF EXISTS "$DB_NAME";
-SQL
+# 3) Drop the database
+echo ">>> Dropping database '$DB_NAME' if it exists..."
+sudo -u postgres psql -v ON_ERROR_STOP=1 -c "
+  DROP DATABASE IF EXISTS \"$DB_NAME\";
+"
 
-echo ">>> Dropping role '$DB_USER' (if exists)..."
-sudo -u postgres psql -v ON_ERROR_STOP=1 <<-SQL
-  SELECT
-    CASE
-      WHEN EXISTS (
-        SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = '$DB_USER'
-      ) THEN
-        'Dropping role.'
-      ELSE
-        'Role does not exist, skipping.'
-    END
-  \gexec
+# 4) Drop the role
+echo ">>> Dropping role '$DB_USER' if it exists..."
+sudo -u postgres psql -v ON_ERROR_STOP=1 -c "
+  DROP ROLE IF EXISTS \"$DB_USER\";
+"
 
-  DROP ROLE IF EXISTS "$DB_USER";
-SQL
-
-echo "✅ Done. '$DB_NAME' and role '$DB_USER' have been removed (if they existed)."
+echo "✅ Done. Database '$DB_NAME' and role '$DB_USER' have been removed (if they existed)."
