@@ -4,22 +4,24 @@ IFS=$'\n\t'
 
 usage() {
   cat <<EOF
-Usage: $0 <system_user> <domain_folder>
+Usage: $0 <system_user> <domain_folder> <db_user> <db_name> <db_pass>
 
 Example:
-  sudo $0 dev erp-dev.hamesha.studio
+  sudo $0 dev erp-dev.hamesha.studio odoo odoo_dev supersecretpass
 EOF
   exit 1
 }
 
-# 1) Args or prompt
-if [[ $# -ge 2 ]]; then
-  SYS_USER="$1"
-  DOMAIN_DIR="$2"
-else
-  read -r -p "System user (e.g. dev): " SYS_USER
-  read -r -p "Domain folder (e.g. erp-dev.hamesha.studio): " DOMAIN_DIR
+# 1) Require exactly five args
+if [[ $# -ne 5 ]]; then
+  usage
 fi
+
+SYS_USER="$1"
+DOMAIN_DIR="$2"
+DB_USER="$3"
+DB_NAME="$4"
+DB_PASS="$5"
 
 HOME_DIR="/home/$SYS_USER"
 BASE_DIR="$HOME_DIR/$DOMAIN_DIR"
@@ -34,15 +36,7 @@ if [[ "$(id -u)" -ne 0 ]]; then
   exit 1
 fi
 
-# 3) Generate dynamic values
-DB_NAME="${DOMAIN_DIR//./_}"
-DB_USER="$SYS_USER"
-
-# Prompt manually for database password (silent input)
-read -s -p "Enter database password for $DB_USER@$DB_NAME: " DB_PASS
-echo
-
-# helper to pick a port between 10000–65000
+# 3) Generate random ports
 generate_port() {
   local port rand
   while :; do
@@ -57,7 +51,7 @@ generate_port() {
 XMLRPC_PORT="$(generate_port)"
 LONGPOLLING_PORT="$(generate_port)"
 
-# 4) Bootstrap Odoo as SYS_USER
+# 4) Bootstrap Odoo as SYS_USER, write odoo.conf, init base
 sudo -u "$SYS_USER" bash <<EOF
 set -euo pipefail
 cd "\$HOME"
@@ -155,6 +149,8 @@ pre_upgrade_scripts =
 upgrade_path =
 CONF
 
+# initialize the base module
+pipenv run python3 "$ODOO_SRC/odoo-bin" -c odoo.conf -i base --stop-after-init
 EOF
 
 # 5) Create systemd service for Odoo
