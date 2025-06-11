@@ -25,7 +25,6 @@ DB_PASS="$5"
 
 HOME_DIR="/home/$SYS_USER"
 BASE_DIR="$HOME_DIR/$DOMAIN_DIR"
-VENV_FLAG="PIPENV_VENV_IN_PROJECT=1"
 ODOO_SRC="/opt/odoo18-ce"
 SERVICE_UNIT="/etc/systemd/system/odoo_${DOMAIN_DIR}.service"
 NGINX_CONF="/etc/nginx/sites-available/$DOMAIN_DIR"
@@ -51,107 +50,72 @@ generate_port() {
 XMLRPC_PORT="$(generate_port)"
 LONGPOLLING_PORT="$(generate_port)"
 
-# 4) Bootstrap Odoo as SYS_USER, write odoo.conf, init base
-sudo -u "$SYS_USER" bash <<EOF
+# 4) Write and run a per-user setup script
+USER_SCRIPT="$HOME_DIR/setup_odoo_user.sh"
+cat > "$USER_SCRIPT" <<EOF
+#!/usr/bin/env bash
 set -euo pipefail
+
 cd "\$HOME"
 
-# create project dir & venv
-mkdir -p "$BASE_DIR"
-cd "$BASE_DIR"
-export $VENV_FLAG
-pipenv --python \$(which python3)
-pipenv run pip install -r "$ODOO_SRC/requirements.txt"
+# load pyenv
+export PYENV_ROOT="\$HOME/.pyenv"
+export PATH="\$PYENV_ROOT/bin:\$PYENV_ROOT/shims:\$PATH"
+eval "\$(pyenv init --path)"
+eval "\$(pyenv init -)"
 
-# generate dynamic odoo.conf
+# project directory
+mkdir -p "\$HOME/$DOMAIN_DIR"
+cd "\$HOME/$DOMAIN_DIR"
+
+# ensure Python version installed & selected
+PYTHON_VERSION="\$(pyenv version-name)"
+pyenv install --skip-existing "\$PYTHON_VERSION"
+pyenv local "\$PYTHON_VERSION"
+
+# clean any old venv and create a fresh one
+rm -rf .venv
+python -m venv .venv
+source .venv/bin/activate
+
+# upgrade pip & core tooling
+python -m pip install --upgrade pip setuptools wheel
+
+# install Odoo dependencies (no cache)
+pip install --no-cache-dir -r "$ODOO_SRC/requirements.txt"
+
+# write dynamic odoo.conf
 cat > odoo.conf <<CONF
 [options]
 addons_path = $ODOO_SRC/odoo/addons,$ODOO_SRC/addons
 server_wide_modules = base,web
-import_partial =
-without_demo = False
-translate_modules = ['all']
-
 admin_passwd = admin
 proxy_mode = False
-dbfilter =
 
-db_host = localhost
-db_port = False
-db_user = $DB_USER
-db_name = $DB_NAME
-db_password = $DB_PASS
-db_template = template0
-db_sslmode = prefer
-unaccent = False
-db_maxconn = 64
-db_maxconn_gevent = False
-db_replica_host = False
-db_replica_port = False
-list_db = True
+db_host       = localhost
+db_port       = False
+db_user       = $DB_USER
+db_name       = $DB_NAME
+db_password   = $DB_PASS
+list_db       = True
 
-http_enable = True
-http_interface =
-http_port = 8069
-gevent_port = 8072
-xmlrpc_port = $XMLRPC_PORT
-longpolling_port = $LONGPOLLING_PORT
-websocket_keep_alive_timeout = 3600
-websocket_rate_limit_burst = 10
-websocket_rate_limit_delay = 0.2
-x_sendfile = False
-pidfile =
+http_enable       = True
+http_port         = 8069
+xmlrpc_port       = $XMLRPC_PORT
+longpolling_port  = $LONGPOLLING_PORT
 
-data_dir = $HOME_DIR/.local/share/Odoo
-
-workers = 0
-max_cron_threads = 2
-limit_memory_hard = 2684354560
-limit_memory_hard_gevent = False
-limit_memory_soft = 2147483648
-limit_memory_soft_gevent = False
-limit_request = 65536
-limit_time_cpu = 60
-limit_time_real = 120
-limit_time_real_cron = -1
-limit_time_worker_cron = 0
-osv_memory_count_limit = 0
-transient_age_limit = 1.0
-
-logfile =
+data_dir = \$HOME/.local/share/Odoo
+workers  = 0
 log_level = info
-log_handler = :INFO
-syslog = False
-log_db = False
-log_db_level = warning
-reportgz = False
-screencasts =
-screenshots = /tmp/odoo_tests
-
-smtp_server = localhost
-smtp_port = 25
-smtp_ssl = False
-smtp_user = False
-smtp_password = False
-smtp_ssl_certificate_filename = False
-smtp_ssl_private_key_filename = False
-email_from = False
-from_filter = False
-
-csv_internal_sep = ,
-geoip_city_db = /usr/share/GeoIP/GeoLite2-City.mmdb
-geoip_country_db = /usr/share/GeoIP/GeoLite2-Country.mmdb
-
-test_enable = False
-test_file =
-test_tags = None
-pre_upgrade_scripts =
-upgrade_path =
 CONF
 
 # initialize the base module
-pipenv run python3 "$ODOO_SRC/odoo-bin" -c odoo.conf -i base --stop-after-init
+python "$ODOO_SRC/odoo-bin" -c odoo.conf -i base --stop-after-init
 EOF
+
+chown "$SYS_USER":"$SYS_USER" "$USER_SCRIPT"
+chmod +x "$USER_SCRIPT"
+sudo -u "$SYS_USER" -H bash "$USER_SCRIPT"
 
 # 5) Create systemd service for Odoo
 cat > "$SERVICE_UNIT" <<EOF
@@ -192,7 +156,6 @@ server {
         proxy_set_header   X-Forwarded-Proto \$scheme;
     }
 
-    # longpolling (chat / live updates)
     location /longpolling/ {
         proxy_pass         http://127.0.0.1:${LONGPOLLING_PORT};
         proxy_set_header   Host \$host;
@@ -207,5 +170,5 @@ ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/
 nginx -t && systemctl reload nginx
 
 echo "✅ Odoo deployed under $BASE_DIR"
-echo "   • systemd service: odoo_${DOMAIN_DIR}.service"
-echo "   • nginx vhost:   /etc/nginx/sites-available/$DOMAIN_DIR"
+echo "   • service:   odoo_${DOMAIN_DIR}.service"
+echo "   • nginx vhost: /etc/nginx/sites-available/$DOMAIN_DIR"
