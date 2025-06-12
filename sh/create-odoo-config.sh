@@ -1,87 +1,79 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Default output
-OUTPUT_FILE="odoo.conf"
-
+# Usage and parameters
 usage() {
   cat <<USAGE
-Usage: $0 -d <domain> -u <db_user> -p <db_pass> [-o <output_file>]
+Usage: $0 <linux_user> <domain> <db_user> <db_name> <db_pass>
 
-  -d  Domain name (dots will be replaced with underscores for db_name)
-  -u  PostgreSQL username
-  -p  PostgreSQL password
-  -o  (optional) where to write the odoo.conf (default: ./odoo.conf)
+  <linux_user>  Linux system username (used for home directory)
+  <domain>      Domain name (e.g. example.com)
+  <db_user>     PostgreSQL username
+  <db_name>     PostgreSQL database name
+  <db_pass>     PostgreSQL password
 USAGE
   exit 1
 }
 
-# parse args
-while getopts ":d:u:p:o:" opt; do
-  case "$opt" in
-    d) DOMAIN="$OPTARG" ;;
-    u) DB_USER="$OPTARG" ;;
-    p) DB_PASS="$OPTARG" ;;
-    o) OUTPUT_FILE="$OPTARG" ;;
-    *) usage ;;
-  esac
-done
-
-# validate
-if [[ -z "${DOMAIN:-}" || -z "${DB_USER:-}" || -z "${DB_PASS:-}" ]]; then
+# Require exactly 5 arguments
+if [[ $# -ne 5 ]]; then
   usage
 fi
 
-# convert domain to db_name
-DB_NAME="${DOMAIN//./_}"
+# Assign positional arguments
+domain="$2"
+linux_user="$1"
+db_user="$3"
+db_name="$4"
+db_pass="$5"
 
-# function to pick a free port in [10000,65000]
+# Determine output directory and file
+OUTPUT_DIR="/home/${linux_user}/${domain}"
+OUTPUT_FILE="${OUTPUT_DIR}/odoo.conf"
+
+# Create output directory if missing
+mkdir -p "$OUTPUT_DIR"
+
+# Function to pick a free TCP port in [10000,65000]
 get_free_port() {
   while :; do
     port=$(( RANDOM % (65000-10000+1) + 10000 ))
-    # using ss to check if it's LISTENING
-    if ! ss -lntu | awk '{print $5}' | grep -E -q "(^|:)$port\$"; then
+    if ! ss -lntu | awk '{print $5}' | grep -E -q "(^|:)$port$"; then
       echo "$port"
       return
     fi
   done
 }
 
-# get two distinct ports
+# Acquire two distinct free ports for XML-RPC and longpolling
 XMLRPC_PORT=$(get_free_port)
 LONGPOLLING_PORT=$(get_free_port)
 if [[ "$LONGPOLLING_PORT" == "$XMLRPC_PORT" ]]; then
   LONGPOLLING_PORT=$(get_free_port)
 fi
 
-# emit the conf
+# Generate the Odoo configuration file
 cat > "$OUTPUT_FILE" <<EOF
 [options]
 
-; ============================================================
 ; 1. Core Add-ons & Modules
-; ============================================================
 addons_path = /opt/odoo18-ce/odoo/addons,/opt/odoo18-ce/addons
 server_wide_modules = base,web
 import_partial =
 without_demo = False
 translate_modules = ['all']
 
-; ============================================================
 ; 2. Security & Access Control
-; ============================================================
 admin_passwd = admin
 proxy_mode = False
 dbfilter =
 
-; ============================================================
 ; 3. Database Configuration & Management
-; ============================================================
 db_host = localhost
 db_port = False
-db_user = $DB_USER
-db_name = $DB_NAME
-db_password = $DB_PASS
+db_user = $db_user
+db_name = $db_name
+db_password = $db_pass
 db_template = template0
 db_sslmode = prefer
 unaccent = False
@@ -91,9 +83,7 @@ db_replica_host = False
 db_replica_port = False
 list_db = True
 
-; ============================================================
 ; 4. Server & Protocol Interfaces
-; ============================================================
 http_enable = True
 http_interface =
 http_port = 8069
@@ -106,14 +96,10 @@ websocket_rate_limit_delay = 0.2
 x_sendfile = False
 pidfile =
 
-; ============================================================
 ; 5. Paths & Data Storage
-; ============================================================
 data_dir = /home/dev/.local/share/Odoo
 
-; ============================================================
 ; 6. Performance & Resource Limits
-; ============================================================
 workers = 0
 max_cron_threads = 2
 limit_memory_hard = 2684354560
@@ -128,9 +114,7 @@ limit_time_worker_cron = 0
 osv_memory_count_limit = 0
 transient_age_limit = 1.0
 
-; ============================================================
 ; 7. Logging & Reporting
-; ============================================================
 logfile =
 log_level = info
 log_handler = :INFO
@@ -141,9 +125,7 @@ reportgz = False
 screencasts =
 screenshots = /tmp/odoo_tests
 
-; ============================================================
 ; 8. Email & Notifications
-; ============================================================
 smtp_server = localhost
 smtp_port = 25
 smtp_ssl = False
@@ -154,16 +136,12 @@ smtp_ssl_private_key_filename = False
 email_from = False
 from_filter = False
 
-; ============================================================
 ; 9. Localization & Data Formats
-; ============================================================
 csv_internal_sep = ,
 geoip_city_db = /usr/share/GeoIP/GeoLite2-City.mmdb
 geoip_country_db = /usr/share/GeoIP/GeoLite2-Country.mmdb
 
-; ============================================================
 ; 10. Testing & Maintenance
-; ============================================================
 test_enable = False
 test_file =
 test_tags = None
@@ -171,6 +149,9 @@ pre_upgrade_scripts =
 upgrade_path =
 EOF
 
-echo "Generated $OUTPUT_FILE:"
-echo "  DB:       $DB_NAME (@$DB_USER)"
-echo "  Ports:    xmlrpc=$XMLRPC_PORT, longpolling=$LONGPOLLING_PORT"
+# Final message
+echo "Generated Odoo config at $OUTPUT_FILE"
+echo "  Domain:     $domain"
+echo "  Linux User: $linux_user"
+echo "  DB:         $db_name (@$db_user)"
+echo "  Ports:      xmlrpc=$XMLRPC_PORT, longpolling=$LONGPOLLING_PORT"
