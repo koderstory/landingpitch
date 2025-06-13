@@ -22,6 +22,7 @@ EOF
 get_free_port() {
   while :; do
     port=$(( RANDOM % (65000-10000+1) + 10000 ))
+    # check if port is not in use
     if ! ss -lntu | awk '{print $5}' | grep -E -q "(^|:)$port$"; then
       echo "$port"
       return
@@ -34,7 +35,13 @@ XMLRPC_PORT=$(get_free_port)
 LONGPOLLING_PORT=$(get_free_port)
 while [ "$LONGPOLLING_PORT" = "$XMLRPC_PORT" ]; do
   LONGPOLLING_PORT=$(get_free_port)
- done
+done
+
+enforce_opts() {
+  if [ -z "${USERNAME:-}" ] || [ -z "${DOMAIN:-}" ] || [ -z "${DB_USER:-}" ] || [ -z "${DB_NAME:-}" ] || [ -z "${DB_PASS:-}" ]; then
+    usage
+  fi
+}
 
 # Parse options
 PYVER=
@@ -52,11 +59,7 @@ while getopts ":u:d:U:n:p:v:h" opt; do
 done
 shift $((OPTIND-1))
 
-enforce_opts() {
-  if [ -z "${USERNAME:-}" ] || [ -z "${DOMAIN:-}" ] || [ -z "${DB_USER:-}" ] || [ -z "${DB_NAME:-}" ] || [ -z "${DB_PASS:-}" ]; then
-    usage
-  fi
-}
+# Validate required parameters
 enforce_opts
 
 # Check user exists
@@ -65,22 +68,25 @@ if ! id "$USERNAME" &>/dev/null; then
   exit 1
 fi
 
-DOMAIN_DIR="/home/$USERNAME/$DOMAIN"
-
 # Prepare directory
+DOMAIN_DIR="/home/$USERNAME/$DOMAIN"
 echo "Creating directory $DOMAIN_DIR..."
 mkdir -p "$DOMAIN_DIR"
 chown "$USERNAME":"$USERNAME" "$DOMAIN_DIR"
 
 # Set python version locally if specified
-echo "Configuring Python version..."
 if [ -n "$PYVER" ]; then
+  echo "Setting pyenv local python to $PYVER in $DOMAIN_DIR..."
   sudo -i -u "$USERNAME" bash -lc "cd '$DOMAIN_DIR' && pyenv local '$PYVER'"
 else
-  echo "Using pyenv global python version"
+  echo "Using pyenv global python version in $DOMAIN_DIR"
 fi
 
-# Create odoo.conf before init/install
+# Install requirements
+echo "Installing Python requirements for Odoo..."
+sudo -i -u "$USERNAME" bash -lc "cd '$DOMAIN_DIR' && pip install -r /opt/odoo18-ce/requirements"
+
+# Create odoo.conf
 CONF_FILE="$DOMAIN_DIR/odoo.conf"
 echo "Generating Odoo config at $CONF_FILE..."
 cat <<EOF > "$CONF_FILE"
@@ -137,7 +143,8 @@ limit_memory_hard_gevent = False
 limit_memory_soft = 2147483648
 limit_memory_soft_gevent = False
 limit_request = 65536
-limit_time_cpu = 60\limit_time_real = 120
+limit_time_cpu = 60
+limit_time_real = 120
 limit_time_real_cron = -1
 limit_time_worker_cron = 0
 osv_memory_count_limit = 0
@@ -178,75 +185,9 @@ pre_upgrade_scripts =
 upgrade_path =
 EOF
 
-# Adjust ownership and permissions for config
+# Adjust ownership and permissions
+echo "Setting ownership and permissions..."
 chown "$USERNAME":"$USERNAME" "$CONF_FILE"
 chmod 640 "$CONF_FILE"
-
-# Install Python requirements
-echo "Installing Python requirements..."
-sudo -i -u "$USERNAME" bash -lc "cd '$DOMAIN_DIR' && pip install -r /opt/odoo18-ce/requirements.txt"
-
-# Initialize database
-echo "Initializing Odoo database (base module)..."
-sudo -i -u "$USERNAME" bash -lc "cd '$DOMAIN_DIR' && /opt/odoo18-ce/odoo-bin -c odoo.conf -i base --stop-after-init"
-
-# Create systemd service
-SERVICE_NAME="odoo_${DOMAIN}"
-SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-echo "Creating systemd service file $SERVICE_FILE..."
-cat <<EOF > "$SERVICE_FILE"
-[Unit]
-Description=Odoo ${DOMAIN}
-After=network.target
-
-[Service]
-User=${USERNAME}
-Group=${USERNAME}
-WorkingDirectory=$DOMAIN_DIR
-ExecStart=/bin/bash -lc 'cd "$DOMAIN_DIR" && /opt/odoo18-ce/odoo-bin -c "$CONF_FILE"'
-Restart=on-failure
-KillMode=process
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start service
-echo "Reloading systemd, enabling and starting $SERVICE_NAME..."
-systemctl daemon-reload
-systemctl enable --now "$SERVICE_NAME"
-
-# Configure Nginx
-NGINX_CONF="/etc/nginx/sites-available/${DOMAIN}"
-echo "Creating nginx config $NGINX_CONF..."
-cat <<EOF > "$NGINX_CONF"
-server {
-    listen 80;
-    server_name ${DOMAIN};
-
-    client_max_body_size 200M;
-    access_log /var/log/nginx/${DOMAIN}.access.log;
-    error_log  /var/log/nginx/${DOMAIN}.error.log;
-
-    location / {
-        proxy_pass         http://127.0.0.1:${XMLRPC_PORT};
-        proxy_set_header   Host \$host;
-        proxy_set_header   X-Real-IP \$remote_addr;
-        proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto \$scheme;
-    }
-
-    location /longpolling/ {
-        proxy_pass         http://127.0.0.1:${LONGPOLLING_PORT};
-        proxy_set_header   Host \$host;
-        proxy_set_header   X-Real-IP \$remote_addr;
-        proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto \$scheme;
-    }
-}
-EOF
-ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/
-echo "Testing nginx config and reloading..."
-nginx -t && systemctl reload nginx
 
 echo "✅ Odoo setup complete for domain $DOMAIN (user: $USERNAME)."
